@@ -8,6 +8,7 @@ vars:
   GITHUB_REPO: '{{.GITHUB_REPO | default "lewars/jenkins-controller"}}'
   USE_CACHE: '{{.USE_CACHE | default "true"}}'
   BASE_IMAGE: '{{.BASE_IMAGE | default "jenkins/jenkins:2.452.2-lts-jdk17"}}'
+  VENV_NAME: '.venv'
 
 tasks:
   build:
@@ -24,10 +25,17 @@ tasks:
         {{end}}
         docker build $BUILD_ARGS $TAGS -f {{.DOCKERFILE}} .
 
+  create-venv:
+    desc: Create Python virtual environment and install pytest-testinfra
+    cmds:
+      - python3 -m venv {{.VENV_NAME}}
+      - ./{{.VENV_NAME}}/bin/pip install pytest-testinfra
+
   test:
     desc: Run tests using pytest-testinfra
+    deps: [create-venv]
     cmds:
-      - pytest -v tests
+      - ./{{.VENV_NAME}}/bin/py.test -v test_infra.py
 
   push:
     desc: Push the image to its registry
@@ -60,6 +68,14 @@ tasks:
         {{else}}
         echo "Please provide IMAGE1 and IMAGE2 variables to compare."
         {{end}}
+
+  clean:
+    desc: Remove virtual environment and temporary files
+    cmds:
+      - rm -rf {{.VENV_NAME}}
+      - rm -f .pytest_cache
+      - rm -f *.pyc
+      - echo "Cleaned up virtual environment and temporary files."
 
   all:
     desc: Run all tasks (build, test, push, release)
