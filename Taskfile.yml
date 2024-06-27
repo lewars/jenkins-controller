@@ -7,13 +7,14 @@ vars:
   BUILD_NUMBER: '{{.BUILD_NUMBER | default ""}}'
   GITHUB_REPO: '{{.GITHUB_REPO | default "lewars/jenkins-controller"}}'
   USE_CACHE: '{{.USE_CACHE | default "true"}}'
+  BASE_IMAGE: '{{.BASE_IMAGE | default "jenkins/jenkins:2.452.2-lts-jdk17"}}'
 
 tasks:
   build:
     desc: Build the Jenkins Docker image
     cmds:
       - |
-        BUILD_ARGS="--build-arg JENKINS_VERSION={{.JENKINS_VERSION}}"
+        BUILD_ARGS="--build-arg BASE_IMAGE={{.BASE_IMAGE}}"
         {{if eq .USE_CACHE "false"}}
         BUILD_ARGS="$BUILD_ARGS --no-cache"
         {{end}}
