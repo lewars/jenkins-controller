@@ -1,0 +1,69 @@
+version: '3'
+
+vars:
+  DOCKER_REPO: '{{.DOCKER_REPO | default "gcr.io/bitwise"}}'
+  IMAGE_NAME: '{{.DOCKER_REPO}}/{{.IMAGE_NAME | default "jenkins-controller"}}'
+  DOCKERFILE: '{{.DOCKERFILE | default "Dockerfile"}}'
+  BUILD_NUMBER: '{{.BUILD_NUMBER | default ""}}'
+  GITHUB_REPO: '{{.GITHUB_REPO | default "lewars/jenkins-controller"}}'
+  USE_CACHE: '{{.USE_CACHE | default "true"}}'
+
+tasks:
+  build:
+    desc: Build the Jenkins Docker image
+    cmds:
+      - |
+        BUILD_ARGS="--build-arg JENKINS_VERSION={{.JENKINS_VERSION}}"
+        {{if eq .USE_CACHE "false"}}
+        BUILD_ARGS="$BUILD_ARGS --no-cache"
+        {{end}}
+        TAGS="-t {{.IMAGE_NAME}}:latest"
+        {{if ne .BUILD_NUMBER ""}}
+        TAGS="$TAGS -t {{.IMAGE_NAME}}:{{.BUILD_NUMBER}}"
+        {{end}}
+        docker build $BUILD_ARGS $TAGS -f {{.DOCKERFILE}} .
+
+  test:
+    desc: Run tests using pytest-testinfra
+    cmds:
+      - pytest -v tests
+
+  push:
+    desc: Push the image to its registry
+    cmds:
+      - docker push {{.IMAGE_NAME}}:latest
+      - |
+        {{if ne .BUILD_NUMBER ""}}
+        docker push {{.IMAGE_NAME}}:{{.BUILD_NUMBER}}
+        {{end}}
+
+  release:
+    desc: Create a GitHub release
+    cmds:
+      - |
+        {{if ne .BUILD_NUMBER ""}}
+        gh release create v{{.BUILD_NUMBER}} \
+          --title "Release {{.BUILD_NUMBER}}" \
+          --notes "Jenkins image release {{.BUILD_NUMBER}}" \
+          --repo {{.GITHUB_REPO}}
+        {{else}}
+        echo "BUILD_NUMBER is not set. Skipping release creation."
+        {{end}}
+
+  diff:
+    desc: Generate a diff between two OCI container images
+    cmds:
+      - |
+        {{if and .IMAGE1 .IMAGE2}}
+        container-diff diff {{.IMAGE1}} {{.IMAGE2}} --type=file --type=size
+        {{else}}
+        echo "Please provide IMAGE1 and IMAGE2 variables to compare."
+        {{end}}
+
+  all:
+    desc: Run all tasks (build, test, push, release)
+    cmds:
+      - task: build
+      - task: test
+      - task: push
+      - task: release
