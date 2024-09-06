@@ -15,7 +15,7 @@ if [ ! -f "$PLUGINS_FILE" ]; then
 fi
 
 echo "Installing plugins from $PLUGINS_FILE..."
-jenkins-plugin-cli -f "$PLUGINS_FILE"
+jenkins-plugin-cli --plugin-file "$PLUGINS_FILE"
 
 echo "Generating list of installed plugins with versions..."
 jenkins-plugin-cli --list --output txt | sort > "$INSTALLED_PLUGINS_FILE"

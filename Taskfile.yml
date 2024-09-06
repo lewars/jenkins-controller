@@ -1,18 +1,38 @@
 version: '3'
 
+dotenv: ['.env']
+
 vars:
-  DOCKER_REPO: '{{.DOCKER_REPO | default "gcr.io/bitwise"}}'
-  IMAGE_NAME: '{{.DOCKER_REPO}}/{{.IMAGE_NAME | default "jenkins-controller"}}'
-  DOCKERFILE: '{{.DOCKERFILE | default "Dockerfile"}}'
-  BUILD_NUMBER: '{{.BUILD_NUMBER | default ""}}'
-  GITHUB_REPO: '{{.GITHUB_REPO | default "lewars/jenkins-controller"}}'
-  USE_CACHE: '{{.USE_CACHE | default "true"}}'
-  BASE_IMAGE: '{{.BASE_IMAGE | default "jenkins/jenkins:2.452.2-lts-jdk17"}}'
-  VENV_NAME: '.venv'
+  DOCKER_REPO: '{{.DOCKER_REPO}}'
+  IMAGE_NAME: '{{.DOCKER_REPO}}/{{.IMAGE_NAME}}'
+  DOCKERFILE: '{{.DOCKERFILE}}'
+  BUILD_NUMBER: '{{.BUILD_NUMBER}}'
+  GITHUB_REPO: '{{.GITHUB_REPO}}'
+  USE_CACHE: '{{.USE_CACHE}}'
+  BASE_IMAGE: '{{.BASE_IMAGE}}'
+  VENV_NAME: '{{.VENV_NAME}}'
+  JENKINS_PORT: '{{.JENKINS_PORT}}'
+  JENKINS_AGENT_PORT: '{{.JENKINS_AGENT_PORT}}'
+  JENKINS_CONTAINER_NAME: '{{.JENKINS_CONTAINER_NAME}}'
+  JENKINS_VOLUME_NAME: '{{.JENKINS_VOLUME_NAME}}'
 
 tasks:
+  show-config:
+    silent: true
+    cmds:
+      - echo "Current configuration:"
+      - "echo DOCKER_REPO: {{.DOCKER_REPO}}"
+      - "echo IMAGE_NAME: {{.IMAGE_NAME}}"
+      - "echo DOCKERFILE: {{.DOCKERFILE}}"
+      - "echo BUILD_NUMBER: {{.BUILD_NUMBER}}"
+      - "echo GITHUB_REPO: {{.GITHUB_REPO}}"
+      - "echo USE_CACHE: {{.USE_CACHE}}"
+      - "echo BASE_IMAGE: {{.BASE_IMAGE}}"
+      - "echo VENV_NAME: {{.VENV_NAME}}"
+
   build:
     desc: Build the Jenkins Docker image
+    deps: [show-config]
     cmds:
       - |
         BUILD_ARGS="--build-arg BASE_IMAGE={{.BASE_IMAGE}}"
@@ -36,6 +56,8 @@ tasks:
     deps: [create-venv]
     cmds:
       - ./{{.VENV_NAME}}/bin/py.test -v test_infra.py
+
+
 
   push:
     desc: Push the image to its registry
@@ -69,6 +91,41 @@ tasks:
         echo "Please provide IMAGE1 and IMAGE2 variables to compare."
         {{end}}
 
+  start-jenkins:
+    desc: Start Jenkins container in detached mode
+    silent: true
+    cmds:
+      - |
+        docker run -d \
+          --name {{.JENKINS_CONTAINER_NAME}} \
+          -p {{.JENKINS_PORT}}:8080 \
+          -p {{.JENKINS_AGENT_PORT}}:50000 \
+          -v {{.JENKINS_VOLUME_NAME}}:/var/jenkins_home \
+          --restart unless-stopped \
+          {{.IMAGE_NAME}}
+      - "echo Jenkins is starting. It will be available at http://localhost:{{.JENKINS_PORT}} once ready."
+      - "echo You can view the logs using: 'task view-jenkins-log' OR docker logs -f {{.JENKINS_CONTAINER_NAME}}"
+
+  stop-jenkins:
+    desc: Stop the Jenkins container
+    cmds:
+      - docker stop {{.JENKINS_CONTAINER_NAME}}
+
+  remove-jenkins:
+    desc: Remove the Jenkins container (does not remove the volume)
+    cmds:
+      - docker rm {{.JENKINS_CONTAINER_NAME}}
+
+  remove-jenkins-volume:
+    desc: Remove the Jenkins volume
+    cmds:
+      - docker volume rm {{.JENKINS_VOLUME_NAME}}
+
+  view-jenkins-log:
+    desc: View Jenkins container logs
+    cmds:
+      - docker logs -f {{.JENKINS_CONTAINER_NAME}}
+
   clean:
     desc: Remove virtual environment and temporary files
     cmds:
@@ -76,6 +133,14 @@ tasks:
       - rm -f .pytest_cache
       - rm -f *.pyc
       - echo "Cleaned up virtual environment and temporary files."
+
+  clean-all:
+    desc: Remove virtual environment, temporary files, containers, and all volumes
+    deps:
+      - clean
+    cmds:
+      - task: remove-jenkins
+      - task: remove-jenkins-volume
 
   all:
     desc: Run all tasks (build, test, push, release)

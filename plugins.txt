@@ -1,0 +1,38 @@
+# This file is used by the Plugin Manager CLI tool to install or update Jenkins plugins
+# Format: "artifact ID"
+
+# Optional formats for version pinning:
+# - artifactId:version
+# - artifactId:version:url
+#
+
+# While version pinning allows for precise control over plugin versions,
+# it comes with some downsides: manual maintenance and potential compatibility
+# issues.
+
+# Core plugins
+git
+workflow-aggregator
+credentials
+matrix-auth
+
+# Additional plugins
+blueocean
+docker-workflow
+kubernetes
+pipeline-utility-steps
+
+# Security plugins
+configuration-as-code
+antisamy-markup-formatter
+
+# UI and reporting plugins
+dashboard-view
+simple-theme-plugin
+
+# Build and deploy plugins
+maven-plugin
+artifactory
+
+# Code quality plugins
+coverage

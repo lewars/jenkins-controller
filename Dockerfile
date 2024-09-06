@@ -9,12 +9,14 @@ LABEL org.opencontainers.image.authors="Alistair Y. Lewars <alistair.lewars@gmai
 LABEL org.opencontainers.image.source="https://github.com/lewars/jenkins-controller"
 
 USER jenkins
-WORKDIR /var/jenkins_home
+WORKDIR  $JENKINS_HOME
 
 COPY --chown=jenkins:jenkins install_jenkins_plugins.sh .
 COPY --chown=jenkins:jenkins plugins.txt .
 
 RUN ./install_jenkins_plugins.sh && \
+    mkdir -p plugins && \
+    chown jenkins:jenkins plugins && \
     cp plugins.txt plugins/ && \
     cp plugins-installed.txt plugins/
 
