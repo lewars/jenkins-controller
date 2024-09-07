@@ -8,6 +8,10 @@ LABEL org.opencontainers.image.description="Custom Jenkins image with pre-instal
 LABEL org.opencontainers.image.authors="Alistair Y. Lewars <alistair.lewars@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/lewars/jenkins-controller"
 
+USER root
+RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d \
+    -b /usr/local/bin
+
 USER jenkins
 WORKDIR  $JENKINS_HOME
 

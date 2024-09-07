@@ -51,13 +51,14 @@ tasks:
       - python3 -m venv {{.VENV_NAME}}
       - ./{{.VENV_NAME}}/bin/pip install pytest-testinfra
 
-  test:
-    desc: Run tests using pytest-testinfra
-    deps: [create-venv]
+  unit-test:
+    desc: Run unit tests using a local running jenkins instance and pytest-testinfra
+    deps: [create-venv, start-jenkins]
     cmds:
-      - ./{{.VENV_NAME}}/bin/py.test -v test_infra.py
-
-
+      - |
+        docker exec -it \
+        {{.JENKINS_CONTAINER_NAME}} \
+        /bin/bash -c "./{{.VENV_NAME}}/bin/py.test -v test_infra.py"
 
   push:
     desc: Push the image to its registry
@@ -101,7 +102,8 @@ tasks:
           -p {{.JENKINS_PORT}}:8080 \
           -p {{.JENKINS_AGENT_PORT}}:50000 \
           -v {{.JENKINS_VOLUME_NAME}}:/var/jenkins_home \
-          --restart unless-stopped \
+          -v ${PWD}/tests:/var/jenkins/tests \
+          -v ${PWD}/.venv:/var/jenkins/.venv \
           {{.IMAGE_NAME}}
       - "echo Jenkins is starting. It will be available at http://localhost:{{.JENKINS_PORT}} once ready."
       - "echo You can view the logs using: 'task view-jenkins-log' OR docker logs -f {{.JENKINS_CONTAINER_NAME}}"
