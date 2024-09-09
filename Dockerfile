@@ -9,8 +9,17 @@ LABEL org.opencontainers.image.authors="Alistair Y. Lewars <alistair.lewars@gmai
 LABEL org.opencontainers.image.source="https://github.com/lewars/jenkins-controller"
 
 USER root
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    && rm -rf /var/lib/apt/lists/*
 RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d \
     -b /usr/local/bin
+
+COPY scripts/setup-venv.sh /usr/local/bin/setup-venv.sh
+RUN chmod +x /usr/local/bin/setup-venv.sh
 
 USER jenkins
 WORKDIR  $JENKINS_HOME
@@ -24,4 +33,6 @@ RUN ./install_jenkins_plugins.sh && \
     cp plugins.txt plugins/ && \
     cp plugins-installed.txt plugins/
 
-ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+CMD ["/bin/bash", "-c", "if [ \"$SETUP_PYTHON_ENV\" = \"true\" ]; then /usr/local/bin/setup-venv.sh; fi && /usr/local/bin/jenkins.sh"]
