@@ -1,0 +1,1 @@
+Custom Jenkins controller Docker image with pre-installed plugins using jenkins-plugin-cli

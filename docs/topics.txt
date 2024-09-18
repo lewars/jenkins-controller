@@ -1,0 +1,7 @@
+jenkins
+docker
+ci-cd
+devops
+automation
+jenkins-plugins
+containerization
