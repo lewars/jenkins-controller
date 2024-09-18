@@ -22,4 +22,4 @@ RUN ./install_jenkins_plugins.sh && \
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
-CMD ["/bin/bash", "-c", "if [ \"$SETUP_PYTHON_ENV\" = \"true\" ]; then /usr/local/bin/setup-venv.sh; fi && /usr/local/bin/jenkins.sh"]
+CMD ["/usr/local/bin/jenkins.sh"]

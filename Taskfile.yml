@@ -29,6 +29,10 @@ tasks:
       - "echo USE_CACHE: {{.USE_CACHE}}"
       - "echo BASE_IMAGE: {{.BASE_IMAGE}}"
       - "echo VENV_NAME: {{.VENV_NAME}}"
+      - "echo JENKINS_PORT: {{.JENKINS_PORT}}"
+      - "echo JENKINS_AGENT_PORT: {{.JENKINS_AGENT_PORT}}"
+      - "echo JENKINS_CONTAINER_NAME: {{.JENKINS_CONTAINER_NAME}}"
+      - "echo JENKINS_VOLUME_NAME: {{.JENKINS_VOLUME_NAME}}"
 
   build:
     desc: Build the Jenkins Docker image
@@ -106,7 +110,6 @@ tasks:
 
   start-jenkins:
     desc: Start Jenkins container in detached mode
-    silent: true
     cmds:
       - |
         docker run -d \
@@ -119,16 +122,22 @@ tasks:
           {{.IMAGE_NAME}}
       - "echo Jenkins is starting. It will be available at http://localhost:{{.JENKINS_PORT}} once ready."
       - "echo You can view the logs using: 'task view-jenkins-log' OR docker logs -f {{.JENKINS_CONTAINER_NAME}}"
+    # status:
+    #   - docker ps | grep "{{.JENKINS_CONTAINER_NAME}}"
 
   stop-jenkins:
     desc: Stop the Jenkins container
     cmds:
       - docker stop {{.JENKINS_CONTAINER_NAME}}
+    # status:
+    #   - test $(docker ps -q -f name={{.JENKINS_CONTAINER_NAME}} | wc -l) -eq 0
 
   remove-jenkins:
     desc: Remove the Jenkins container (does not remove the volume)
     cmds:
       - docker rm {{.JENKINS_CONTAINER_NAME}}
+    # status:
+    #   - test $(docker container ls | grep -q {{.JENKINS_CONTAINER_NAME}}} | wc -l) -eq 0
 
   remove-jenkins-volume:
     desc: Remove the Jenkins volume

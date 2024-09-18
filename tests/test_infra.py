@@ -1,18 +1,24 @@
 # test_infra.py
 import pytest
+import platform
 from conftest import CONTAINER_NAME, CONTROLLER_SOCKET, AGENT_SOCKET
 
+
+def is_macos():
+    return platform.system() == 'Darwin'
 
 def test_jenkins_container(host):
     """Test Jenkins controller is running"""
     assert host.docker(CONTAINER_NAME).is_running
 
 
+@pytest.mark.skipif(is_macos(), reason="This test is not supported on macOS")
 def test_jenkins_port(host):
     """Test Jenkins controller port is up and listening"""
     assert host.socket(CONTROLLER_SOCKET).is_listening
 
 
+@pytest.mark.skipif(is_macos(), reason="This test is not supported on macOS")
 def test_jenkins_agent_port(host):
     """Test Jenkins agent port is up and listening"""
     assert host.socket(AGENT_SOCKET).is_listening
