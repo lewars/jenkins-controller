@@ -118,6 +118,8 @@ tasks:
           -p {{.JENKINS_AGENT_PORT}}:50000 \
           -v {{.JENKINS_VOLUME_NAME}}:/var/jenkins_home \
           -v ${PWD}/tests:/var/jenkins_home/tests:Z \
+          -v ${PWD}/jenkins.yaml:/var/jenkins_home/jenkins.yaml:Z \
+          -e CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins.yaml \
           -e SETUP_PYTHON_ENV=true \
           {{.IMAGE_NAME}}
       - "echo Jenkins is starting. It will be available at http://localhost:{{.JENKINS_PORT}} once ready."

@@ -36,3 +36,6 @@ artifactory
 
 # Code quality plugins
 coverage
+
+# Configuration
+configuration-as-code
