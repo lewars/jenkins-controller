@@ -79,6 +79,13 @@ tasks:
         py.test -v tests/test_infra.py
         deactivate
 
+  integration-test:
+    desc: Run integration tests using on remote jenkins instance
+    cmds:
+      - |
+        set -e
+        echo "Running integration tests..."
+
   push:
     desc: Push the image to its registry
     cmds:
@@ -127,6 +134,8 @@ tasks:
           -e JAVA_OPTS="${JAVA_OPTS} -Djenkins.install.runSetupWizard=false -Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true -Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true" \
           -e CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins.yaml \
           -e SETUP_PYTHON_ENV=true \
+          --security-opt seccomp=unconfined \
+          --security-opt apparmor=unconfined \
           {{.IMAGE_NAME}}
       - "echo Jenkins is starting. It will be available at http://localhost:{{.JENKINS_PORT}} once ready."
       - "echo You can view the logs using: 'task view-jenkins-log' OR docker logs -f {{.JENKINS_CONTAINER_NAME}}"

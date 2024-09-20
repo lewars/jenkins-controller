@@ -20,15 +20,9 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Integration Test') {
             steps {
-                sh(script: 'task build', label: 'Build Docker image')
-            }
-        }
-
-        stage('Unit Test') {
-            steps {
-                sh(script: 'task unit-test', label: 'Run unit tests')
+                sh(script: 'task integration-test', label: 'Run integration tests')
             }
             post {
                 always {
@@ -38,36 +32,9 @@ pipeline {
             }
         }
 
-        stage('Push Image') {
-            when {
-                expression {
-                    return false
-                }
-                // branch 'main'
-            }
-            steps {
-                sh(script: 'task push',
-                   label: 'Push Docker image to repository')
-            }
-        }
-
-        stage('Release') {
-            when {
-                expression {
-                    return false
-                }
-                // branch 'main'
-            }
-            steps {
-                sh(script: 'task release', label: 'Create GitHub release')
-            }
-        }
-    }
-
     post {
-        always {
-            sh(script: 'task clean', label: 'Clean up environment')
-            sh(script: 'task stop-jenkins', label: 'Stop Jenkins test instance')
+        success {
+            echo "send a message to slack, placholder"
         }
         failure {
             echo "send a message to slack, placholder"
