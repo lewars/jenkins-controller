@@ -22,6 +22,8 @@ pipelineJob('jenkins-ci-test') {
                 logRotator {
                     numToKeepStr('10')
                     daysToKeepStr('30')
+                    artifactDaysToKeepStr("50")
+                    artifactNumToKeepStr("5")
                 }
             }
         }
