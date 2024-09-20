@@ -13,10 +13,12 @@ LABEL org.opencontainers.image.source="https://github.com/lewars/jenkins-control
 USER jenkins
 WORKDIR  $JENKINS_HOME
 
-COPY --chown=jenkins:jenkins install_jenkins_plugins.sh .
+COPY --chown=jenkins:jenkins scripts ./scripts
 COPY --chown=jenkins:jenkins plugins.txt .
 
-RUN ./install_jenkins_plugins.sh && \
+RUN echo "DEBUG: list script files" && \
+    ls -l scripts
+RUN ./scripts/install_jenkins_plugins.sh && \
     mkdir -p plugins && \
     chown jenkins:jenkins plugins && \
     cp plugins.txt plugins/ && \

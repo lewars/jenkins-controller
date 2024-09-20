@@ -13,3 +13,24 @@ jenkins:
   authorizationStrategy:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: false
+
+jobs:
+  - script: >
+      job('seed-jenkins-ci-job') {
+        scm {
+          git {
+            remote {
+              url('file:///jenkins-controller')
+            }
+            branch('main')
+          }
+        }
+        steps {
+          dsl {
+            external('scripts/create_job_dsl.groovy')
+            removeAction('DELETE')
+            removeViewAction('DELETE')
+            ignoreExisting(false)
+          }
+        }
+      }

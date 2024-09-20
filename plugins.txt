@@ -10,32 +10,20 @@
 # it comes with some downsides: manual maintenance and potential compatibility
 # issues.
 
-# Core plugins
-git
-workflow-aggregator
-credentials
-matrix-auth
-
-# Additional plugins
-blueocean
-docker-workflow
-kubernetes
-pipeline-utility-steps
-
-# Security plugins
-configuration-as-code
 antisamy-markup-formatter
-
-# UI and reporting plugins
-dashboard-view
-simple-theme-plugin
-
-# Build and deploy plugins
-maven-plugin
 artifactory
-
-# Code quality plugins
-coverage
-
-# Configuration
+blueocean
 configuration-as-code
+configuration-as-code
+coverage
+credentials
+dashboard-view
+docker-workflow
+git
+job-dsl
+kubernetes
+matrix-auth
+maven-plugin
+pipeline-utility-steps
+simple-theme-plugin
+workflow-aggregator

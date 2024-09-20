@@ -121,9 +121,11 @@ tasks:
           -p {{.JENKINS_PORT}}:8080 \
           -p {{.JENKINS_AGENT_PORT}}:50000 \
           -v {{.JENKINS_VOLUME_NAME}}:/var/jenkins_home \
+          -v ${PWD}:/jenkins-controller:Z \
           -v ${PWD}/tests:/var/jenkins_home/tests:Z \
           -v ${PWD}/jenkins.yaml:/var/jenkins_home/jenkins.yaml:Z \
           -e JAVA_OPTS="${JAVA_OPTS} -Djenkins.install.runSetupWizard=false" \
+          -e JAVA_OPTS="${JAVA_OPTS} -Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true" \
           -e CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins.yaml \
           -e SETUP_PYTHON_ENV=true \
           {{.IMAGE_NAME}}
