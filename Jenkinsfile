@@ -10,6 +10,11 @@ pipeline {
         skipStagesAfterUnstable()
     }
 
+    // set trigger to run every 5 minutes
+    triggers {
+        cron('H/5 * * * *')
+    }
+
     stages {
         stage('Prepare') {
             steps {

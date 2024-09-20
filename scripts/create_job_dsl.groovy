@@ -1,5 +1,5 @@
 pipelineJob('jenkins-ci-test') {
-    description('Updated Pipeline for building, testing, and deploying using Taskfile')
+    description('Jenkins pipeline for building, testing, and deploying Jenkins using Task')
 
     definition {
         cpsScm {
@@ -13,32 +13,6 @@ pipelineJob('jenkins-ci-test') {
             }
             scriptPath('Jenkinsfile')
         }
-    }
-
-    properties {
-        disableConcurrentBuilds()
-        buildDiscarder {
-            strategy {
-                logRotator {
-                    numToKeepStr('10')
-                    daysToKeepStr('30')
-                    artifactDaysToKeepStr("50")
-                    artifactNumToKeepStr("5")
-                }
-            }
-        }
-    }
-
-    triggers {
-        scm('H/15 * * * *')
-    }
-
-    wrappers {
-        timeout {
-            absolute(10)
-        }
-        timestamps()
-        ansiColor('xterm')
     }
 
     publishers {
