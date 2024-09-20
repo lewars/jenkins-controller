@@ -14,10 +14,16 @@ jenkins:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: false
 
+security:
+  scriptApproval:
+    approvedSignatures:
+      - "method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods println java.lang.Object java.lang.Object"
+
 jobs:
   - script: >
-      job('seed-jenkins-ci-job') {
-        scm {
+      job('seed-job-jenkins-ci-test') {
+      scm {
           git {
             remote {
               url('file:///jenkins-controller')

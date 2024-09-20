@@ -12,8 +12,8 @@
 
 antisamy-markup-formatter
 artifactory
+authorize-project
 blueocean
-configuration-as-code
 configuration-as-code
 coverage
 credentials
@@ -25,5 +25,6 @@ kubernetes
 matrix-auth
 maven-plugin
 pipeline-utility-steps
+script-security
 simple-theme-plugin
 workflow-aggregator

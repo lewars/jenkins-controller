@@ -16,8 +16,8 @@ WORKDIR  $JENKINS_HOME
 COPY --chown=jenkins:jenkins scripts ./scripts
 COPY --chown=jenkins:jenkins plugins.txt .
 
-RUN echo "DEBUG: list script files" && \
-    ls -l scripts
+RUN mkdir -p $JENKINS_HOME/init.groovy.d/ && \
+    cp ./scripts/approve-scripts.groovy $JENKINS_HOME/init.groovy.d/
 RUN ./scripts/install_jenkins_plugins.sh && \
     mkdir -p plugins && \
     chown jenkins:jenkins plugins && \
