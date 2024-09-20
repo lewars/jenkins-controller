@@ -4,6 +4,8 @@ ARG BASE_IMAGE
 
 FROM ${BASE_IMAGE}
 
+ARG BASE_IMAGE
+
 LABEL org.opencontainers.image.description="Custom Jenkins image with pre-installed plugins"
 LABEL org.opencontainers.image.authors="Alistair Y. Lewars <alistair.lewars@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/lewars/jenkins-controller"

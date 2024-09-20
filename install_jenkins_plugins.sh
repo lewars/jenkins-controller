@@ -18,7 +18,8 @@ echo "Installing plugins from $PLUGINS_FILE..."
 jenkins-plugin-cli --plugin-file "$PLUGINS_FILE"
 
 echo "Generating list of installed plugins with versions..."
-jenkins-plugin-cli --list --output txt | sort > "$INSTALLED_PLUGINS_FILE"
+echo "# Jenkins controller base image: ${BASE_IMAGE}" > "$INSTALLED_PLUGINS_FILE"
+jenkins-plugin-cli --list --output txt | sort >> "$INSTALLED_PLUGINS_FILE"
 
 echo "Installation complete. List of installed plugins saved to $INSTALLED_PLUGINS_FILE"
 
