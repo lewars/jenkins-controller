@@ -15,6 +15,7 @@ vars:
   JENKINS_AGENT_PORT: '{{.JENKINS_AGENT_PORT}}'
   JENKINS_CONTAINER_NAME: '{{.JENKINS_CONTAINER_NAME}}'
   JENKINS_VOLUME_NAME: '{{.JENKINS_VOLUME_NAME}}'
+  JENKINS_STARTUP_TIME: '{{.JENKINS_STARTUP_TIME}}'
 
 tasks:
   show-config:
@@ -33,6 +34,7 @@ tasks:
       - "echo JENKINS_AGENT_PORT: {{.JENKINS_AGENT_PORT}}"
       - "echo JENKINS_CONTAINER_NAME: {{.JENKINS_CONTAINER_NAME}}"
       - "echo JENKINS_VOLUME_NAME: {{.JENKINS_VOLUME_NAME}}"
+      - "echo JENKINS_STARTUP_TIME: {{.JENKINS_STARTUP_TIME}}"
 
   build:
     desc: Build the Jenkins Docker image
@@ -72,6 +74,7 @@ tasks:
     cmds:
       - |
         set -e
+        sleep 5
         source ./{{.VENV_NAME}}/bin/activate
         py.test -v tests/test_infra.py
         deactivate
@@ -120,6 +123,7 @@ tasks:
           -v {{.JENKINS_VOLUME_NAME}}:/var/jenkins_home \
           -v ${PWD}/tests:/var/jenkins_home/tests:Z \
           -v ${PWD}/jenkins.yaml:/var/jenkins_home/jenkins.yaml:Z \
+          -e JAVA_OPTS="${JAVA_OPTS} -Djenkins.install.runSetupWizard=false" \
           -e CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins.yaml \
           -e SETUP_PYTHON_ENV=true \
           {{.IMAGE_NAME}}
