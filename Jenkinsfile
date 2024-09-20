@@ -31,9 +31,13 @@ pipeline {
                 }
             }
         }
+    }
 
     post {
         success {
+            echo "send a message to slack, placholder"
+        }
+        failure {
             echo "send a message to slack, placholder"
         }
     }
