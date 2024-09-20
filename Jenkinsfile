@@ -5,8 +5,6 @@ pipeline {
         timeout(time: 10, unit: 'MINUTES')
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '10', daysToKeepStr: '30'))
-        ansiColor('xterm')
-        skipStagesAfterUnstable()
     }
 
     // set trigger to run every 5 minutes
