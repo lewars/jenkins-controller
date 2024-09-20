@@ -68,7 +68,7 @@ tasks:
 
   unit-test:
     desc: Run unit tests using a local running jenkins instance and pytest-testinfra
-    deps: [create-venv]
+    deps: [create-venv, show-config, start-jenkins]
     cmds:
       - |
         set -e
@@ -114,6 +114,7 @@ tasks:
       - |
         docker run -d \
           --name {{.JENKINS_CONTAINER_NAME}} \
+          --rm \
           -p {{.JENKINS_PORT}}:8080 \
           -p {{.JENKINS_AGENT_PORT}}:50000 \
           -v {{.JENKINS_VOLUME_NAME}}:/var/jenkins_home \
@@ -124,27 +125,30 @@ tasks:
           {{.IMAGE_NAME}}
       - "echo Jenkins is starting. It will be available at http://localhost:{{.JENKINS_PORT}} once ready."
       - "echo You can view the logs using: 'task view-jenkins-log' OR docker logs -f {{.JENKINS_CONTAINER_NAME}}"
-    # status:
-    #   - docker ps | grep "{{.JENKINS_CONTAINER_NAME}}"
+    status:
+      - docker ps | grep "{{.JENKINS_CONTAINER_NAME}}"
 
   stop-jenkins:
     desc: Stop the Jenkins container
     cmds:
       - docker stop {{.JENKINS_CONTAINER_NAME}}
-    # status:
-    #   - test $(docker ps -q -f name={{.JENKINS_CONTAINER_NAME}} | wc -l) -eq 0
+    status:
+      - test $(docker ps -q -f name={{.JENKINS_CONTAINER_NAME}} | wc -l) -eq 0
 
+  # This task is not really needed as the container is removed when stopped
   remove-jenkins:
     desc: Remove the Jenkins container (does not remove the volume)
     cmds:
       - docker rm {{.JENKINS_CONTAINER_NAME}}
-    # status:
-    #   - test $(docker container ls | grep -q {{.JENKINS_CONTAINER_NAME}}} | wc -l) -eq 0
+    status:
+      - test $(docker container ls | grep {{.JENKINS_CONTAINER_NAME}}} | wc -l) -eq 0
 
   remove-jenkins-volume:
     desc: Remove the Jenkins volume
     cmds:
       - docker volume rm {{.JENKINS_VOLUME_NAME}}
+    status:
+      - test $(docker volume ls | grep {{.JENKINS_VOLUME_NAME}} | wc -l) -eq 0
 
   view-jenkins-log:
     desc: View Jenkins container logs
