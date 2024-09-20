@@ -5,7 +5,6 @@ pipeline {
         timeout(time: 10, unit: 'MINUTES')
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '10', daysToKeepStr: '30'))
-        timestamps()
         ansiColor('xterm')
         skipStagesAfterUnstable()
     }
