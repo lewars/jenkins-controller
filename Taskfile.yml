@@ -164,14 +164,13 @@ tasks:
     desc: Remove virtual environment and temporary files
     cmds:
       - rm -rf {{.VENV_NAME}}
-      - rm -f .pytest_cache
-      - rm -f *.pyc
+      - rm -rf .pytest_cache
+      - find . -name \*.pyc | xargs rm -f *.pyc
       - echo "Cleaned up virtual environment and temporary files."
 
   clean-all:
     desc: Remove virtual environment, temporary files, containers, and all volumes
-    deps:
-      - clean
+    deps: [clean, stop-jenkins]
     cmds:
       - task: remove-jenkins
       - task: remove-jenkins-volume
